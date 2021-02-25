@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Music | Dayside</title>
+	<meta property="og:title" content="Music | Dayside">
+	<meta name="description" content="">
+	<meta property="og:description" content="">
+	<meta name="keywords" content="">
+	<meta property="og:type" content="website"/>
+	<meta property="og:url" content=""/>
+	<meta property="og:image" content="" />
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="627">
+	<link rel="shortcut icon" href="" type="image/x-icon" />
+	<meta property="og:site_name" content="Dayside"/>
+	<meta content="zh_TW" property="og:locale">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<link rel="stylesheet" type="text/css" href="assets/css/main.css">
+</head>
+<body>
+	<!-- 內容 -->
+	<div class="app">
+		<main class="main">
+			<section class="wrapper">
+				<div class="container">
+					<div class="title">
+						2020
+					</div>
+
+					<div id="cards-list" class="cards-list">
+						<!-- card -->
+						<!-- <div class="card">
+							<div class="card__img">
+								<img src="" alt="">
+							</div>
+
+							<div class="card__content">
+								<h2 class="artist"></h2>
+								<h3 class="album"></h3>
+								<div class="release"></div>
+								<div class="tags"></div>
+
+								<div class="review-info">
+									<div class="reviewtime"></div>
+									<div class="ranking"></div>
+								</div>
+							</div>
+						</div> -->
+						<!-- card END -->
+					</div>
+				</div>
+			</section>
+		</main>
+	</div>
+	<!-- 內容 END -->
+
+	<div class="footer">
+		<div class="container">
+			Copyright © Dayside. All rights reserved. <br class="mobile">版權所有，禁止擅自轉貼節錄
+		</div>
+	</div>
+
+
+	<!-- JS -->
+	<script src="assets/js/jquery.min.js"></script>
+	
+	<script>
+		$(function() {
+			$.get('https://spreadsheets.google.com/feeds/list/1H_14pfuH3OMJSqQqVIeemHBgoP6rMq8oU9CckXMD-xA/od6/public/values?alt=json', function(data) {
+				var d = data.feed.entry;
+				var items = [];
+				for(var i in d) {
+					var item = {};
+					// 歌手
+					item.artist = d[i].gsx$artist.$t;
+					// 專輯名稱
+					item.album = d[i].gsx$album.$t;
+					// 封面圖
+					item.cover = d[i].gsx$cover.$t;
+					// 發行年份
+					item.release = d[i].gsx$release.$t;
+					// Tags
+					item.tags = d[i].gsx$tags.$t;
+					// 喜愛程度
+					item.ranking = d[i].gsx$ranking.$t;
+					// 聆聽月份
+					item.reviewtime = d[i].gsx$reviewtime.$t;
+
+					items.push(item);
+				}
+				console.table(items);
+				for(var i in items) {
+					var Card = `
+						<!-- card -->
+						<div class="card">
+							<div class="card__img">
+								<img src="${items[i].cover}" alt="${items[i].album}/${items[i].artist}">
+
+							</div>
+
+							<div class="card__content">
+								<h2 class="artist">${items[i].artist}</h2>
+								<h3 class="album">${items[i].album}</h3>
+								<div class="release">${items[i].release}</div>
+								<div class="tags">${items[i].tags}</div>
+
+								<div class="review-info">
+									<div class="reviewtime">聆聽月份：<span>${items[i].reviewtime}</span></div>
+								<div class="ranking" data-count="${items[i].ranking}"><span>0</span></div>
+								</div>
+							</div>
+						</div>
+						<!-- card END -->
+					`;
+					$('.cards-list').append(Card);
+				}
+			});
+		});
+	</script>
+
+	<!-- data-count -->
+	<script>
+		var a = 0;
+		$(window).scroll(function() {
+
+			var oTop = $('#cards-list').offset().top - window.innerHeight;
+			if (a == 0 && $(window).scrollTop() > oTop) {
+				$('.ranking').each(function() {
+					var $this = $(this),
+						countTo = $this.attr('data-count');
+					$({
+						countNum: $this.text()
+					}).animate({
+							countNum: countTo
+						},
+
+						{
+							duration: 1000,
+							easing: 'swing',
+							step: function() {
+								$this.text(Math.floor(this.countNum));
+							},
+							complete: function() {
+								$this.text(this.countNum);
+							}
+						});
+				});
+				a = 1;
+			}
+		});
+	</script>
+</body>
+</html>
